@@ -1,0 +1,76 @@
+using System.Collections;
+using UnityEngine;
+using System.IO;
+using UnityEngine.Networking;
+
+public class ConfigLoader : MonoBehaviour
+{
+    public ScriptableObject[] scriptableObjects;
+
+
+    private void Awake()
+    {
+        StartCoroutine(CoroutineLoadAllJsons());
+    }
+
+    IEnumerator CoroutineLoadAllJsons()
+    {
+        foreach (var scriptableObject in scriptableObjects)
+        {
+            yield return StartCoroutine(LoadJsonFile(scriptableObject));
+        }
+
+        Debug.Log("All Json Loaded");
+    }
+
+    IEnumerator LoadJsonFile(ScriptableObject outSO)
+    {
+        string jsonData = "";
+        string jsonName = outSO.name + ".json";
+        string filePath = Path.Combine(Application.streamingAssetsPath, jsonName);
+
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError("File not found: " + filePath);
+            return;
+        }
+
+        if (filePath.StartsWith("jar") || filePath.StartsWith("http"))
+        {
+            // Special case to access StreamingAsset content on Android and Web
+            UnityWebRequest request = UnityWebRequest.Get(filePath);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                jsonData = request.downloadHandler.text;
+            }
+        }
+        else
+        {
+            // This is a regular file path on most platforms and in playmode of the editor
+            jsonData = System.IO.File.ReadAllText(filePath);
+        }
+
+        JsonUtility.FromJsonOverwrite(System.IO.File.ReadAllText(jsonData), outSO);
+        Debug.Log("Json Overwrited: " + jsonName);
+    }
+
+    [ContextMenu("Create Streaming Assets Json Files")]
+    void CreateStreamingAssetsJsonFiles()
+    {
+        foreach (var scriptableObject in scriptableObjects)
+        {
+            SaveScriptableObjectAsJson(scriptableObject);
+        }
+    }
+
+    private void SaveScriptableObjectAsJson(ScriptableObject so)
+    {
+        string json = JsonUtility.ToJson(so);
+        string jsonName = so.name + ".json";
+        string path = Path.Combine(Application.streamingAssetsPath, jsonName);
+        File.WriteAllText(path, json);
+        Debug.Log("ScriptableObject saved as JSON to StreamingAssets: " + path);
+    }
+}
