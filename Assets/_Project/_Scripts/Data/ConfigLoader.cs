@@ -32,7 +32,7 @@ public class ConfigLoader : MonoBehaviour
         if (!File.Exists(filePath))
         {
             Debug.LogError("File not found: " + filePath);
-            return;
+            yield break;
         }
 
         if (filePath.StartsWith("jar") || filePath.StartsWith("http"))
