@@ -4,40 +4,51 @@ using UnityEngine;
 
 public class TrackingShooter : MonoBehaviour, IShooter
 {
-    public ShipController tempShip;
-    public ITracker<Asteroid> asteroidTracker;
+    private ITracker<Asteroid> _asteroidTracker;
+
+    [SerializeField] private Bullet bulletPrefab;
+
+    [SerializeField] private SO_ShooterParameters soShooterParameters;
+    [SerializeField, Tooltip("Used when SO is null")] private ShooterParameters _debugShooterParameters;
+    private ShooterParameters Parameters
+    {
+        get { return soShooterParameters ? soShooterParameters.shooterParameters : _debugShooterParameters; }
+    }
+
+    private float _currentCooldown;
+
+    [SerializeField] Transform spawnPoint;
+
+    public GameObject GetGameObject => gameObject ? gameObject : null;
 
 
-    public Bullet bulletPrefab;
+    private HashSet<Bullet> _activeBullets = new HashSet<Bullet>();
 
 
-    [SerializeField] float bulletPower = 30f;
-
-    [SerializeField] float bulletCooldown = 1f;
-    private float currentCooldown;
-
-    [SerializeField] Transform startPosition;
-
-
-    public GameObject GetGameObject => gameObject;
+    private void Awake()
+    {
+        _asteroidTracker = GetComponent<ITracker<Asteroid>>();
+    }
 
     private void Start()
     {
-        asteroidTracker = GetComponent<ITracker<Asteroid>>();
-        tempShip = GetComponent<ShipController>();
+        _currentCooldown = Parameters.bulletCooldown;
     }
 
     private void Update()
     {
         //Bullet cooldown
-        if (currentCooldown > 0) currentCooldown -= Time.deltaTime;
-        else
+        if (_currentCooldown > 0) _currentCooldown -= Time.deltaTime;
+        else if (_activeBullets.Count < Parameters.maxAmountBullets)
         {
             //If ready to shoot
-            if (asteroidTracker.listItems.Count > 0 && asteroidTracker.listItems[0] != null)
+            if (_asteroidTracker.ObjectDetected)
             {
-                ShootTarget(asteroidTracker.listItems[0].transform);
-                currentCooldown = bulletCooldown;
+                Transform target = _asteroidTracker.ObjectList[0].transform;
+
+                ShootTarget(target);
+
+                _currentCooldown = Parameters.bulletCooldown;
             }
         }
     }
@@ -46,15 +57,21 @@ public class TrackingShooter : MonoBehaviour, IShooter
     void ShootTarget(Transform target )
     {
         TargetData data = new TargetData(target.position, target);
+        Vector2 velocity = Calculate(data).initialVelocity.normalized;
+        float angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
 
-        FireBullet(Calculate(data));
-        
+        Shoot(spawnPoint.position, Quaternion.Euler(0, 0, angle - 90));
+    }
+
+    public void Shoot(Vector3 spawnPosition, Quaternion rotation)
+    {
+        Bullet bullet = Instantiate(bulletPrefab, spawnPosition, rotation);
+        bullet.SetInitialValues(this, Parameters.bulletSpeed, Parameters.bulletLifeTime);
+        _activeBullets.Add(bullet);
     }
 
     public LaunchData Calculate(TargetData data)
     {
-        bulletPower = bulletPrefab.speed;
-
         LaunchData newData = CalculatePath2D(data);
 
         //DebugPause(newData);
@@ -63,19 +80,19 @@ public class TrackingShooter : MonoBehaviour, IShooter
 
     LaunchData CalculatePath2D(TargetData target)
     {
-        LaunchData bullet = new LaunchData();
+        LaunchData bulletData = new LaunchData();
         Rigidbody2D targetRigidbody = target.targetObject.GetComponent<Rigidbody2D>();
 
         Vector3 velocity = GetBulletVelocity2D(targetRigidbody, target);
         if (targetRigidbody != null)
-            bullet.timeToTarget = TimeToImpact(targetRigidbody);
+            bulletData.timeToTarget = TimeToImpact(targetRigidbody);
 
-        return FillBulletData(bullet, velocity, target);
+        return FillBulletData(bulletData, velocity, target);
     }
 
     Vector3 GetBulletVelocity2D(Rigidbody2D targetRigidbody, TargetData target)
     {
-        Vector3 v = targetRigidbody != null ? AnticipateVelocity(targetRigidbody).normalized : startPosition.position.DirectionTo(target.targetPosition).normalized;
+        Vector3 v = targetRigidbody != null ? AnticipateVelocity(targetRigidbody).normalized : spawnPoint.position.DirectionTo(target.targetPosition).normalized;
         return v;
     }
 
@@ -83,50 +100,36 @@ public class TrackingShooter : MonoBehaviour, IShooter
     {
         float timeToHit = TimeToImpact(target);
         Vector3 expectedPosition = target.position + target.velocity * timeToHit;
-        Vector3 dir = expectedPosition - startPosition.position;
+        Vector3 dir = expectedPosition - spawnPoint.position;
         return dir.normalized;
     }
 
     float TimeToImpact(Rigidbody2D target)
     {
-        Vector2 estimatedRigidbodyVelocity = (target.position - (Vector2)startPosition.position).normalized * bulletPower;
-        float distance = Vector2.Distance(startPosition.position, target.position);
+        Vector2 estimatedRigidbodyVelocity = (target.position - (Vector2)spawnPoint.position).normalized * Parameters.bulletSpeed;
+        float distance = Vector2.Distance(spawnPoint.position, target.position);
         Vector2 relativeVelocity = estimatedRigidbodyVelocity - target.velocity;
         return distance / relativeVelocity.magnitude;
     }
 
-    LaunchData FillBulletData(LaunchData arrowData, Vector3 velocity, TargetData target)
+    LaunchData FillBulletData(LaunchData bulletData, Vector3 velocity, TargetData target)
     {
-        arrowData.initialVelocity = velocity * bulletPower;
-        arrowData.initialPosition = startPosition.position;
-        arrowData.targetPosition = target.targetPosition;
-        arrowData.horizontalDistance = Vector3.Distance(arrowData.initialPosition, target.targetPosition.With(y: arrowData.initialPosition.y));
-        return arrowData;
-    }
-
-    void FireBullet(LaunchData lData)
-    {
-        Vector2 velocity = lData.initialVelocity.normalized;
-        float angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg; //(velocity.y, velocity.x)
-
-        Bullet bullet = Instantiate(bulletPrefab, startPosition.position, Quaternion.Euler(0, 0, angle - 90)).GetComponent<Bullet>();
-        bullet.Owner = tempShip.GetComponent<IShooter>();
+        bulletData.initialVelocity = velocity * Parameters.bulletSpeed;
+        bulletData.initialPosition = spawnPoint.position;
+        bulletData.targetPosition = target.targetPosition;
+        bulletData.horizontalDistance = Vector3.Distance(bulletData.initialPosition, target.targetPosition.With(y: bulletData.initialPosition.y));
+        return bulletData;
     }
 
     void DebugPause(LaunchData d)
     {
-        Debug.DrawLine(startPosition.position, d.targetPosition, Color.red);
-        Debug.DrawLine(startPosition.position, d.initialVelocity, Color.white);
+        Debug.DrawLine(spawnPoint.position, d.targetPosition, Color.red);
+        Debug.DrawLine(spawnPoint.position, d.initialVelocity, Color.white);
         Debug.Break();
-    }
-
-    public void Shoot()
-    {
-        throw new System.NotImplementedException();
     }
 
     public void BulletDestroid(Bullet bullet)
     {
-        throw new System.NotImplementedException();
+        _activeBullets.Remove(bullet);
     }
 }

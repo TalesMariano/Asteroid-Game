@@ -13,10 +13,12 @@ public class ObjectDetector : MonoBehaviour, ITracker<Asteroid>
 
     [SerializeField] private List<Asteroid> asteroids;
 
-    public List<Asteroid> listItems
+    public List<Asteroid> ObjectList
     {
         get => asteroids; 
     }
+
+    public bool ObjectDetected => throw new System.NotImplementedException();
 
     void Update()
     {

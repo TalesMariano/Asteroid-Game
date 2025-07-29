@@ -4,36 +4,39 @@ using UnityEngine;
 
 public class SimpleShooter : MonoBehaviour, IShooter
 {
-    [SerializeField] Transform spawnPoint;
+    [SerializeField] private SO_ShooterParameters soShooterParameters;
+    [SerializeField, Tooltip("Used when SO is null")] private ShooterParameters _debugShooterParameters;
+    private ShooterParameters Parameters
+    {
+        get { return soShooterParameters ? soShooterParameters.shooterParameters : _debugShooterParameters; }
+    }
 
-    public int maxBullets = 1;
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private Bullet _bulletPrefab;
 
-    public Bullet bulletPrefab;
-
-    private HashSet<Bullet> activeBullets = new HashSet<Bullet>();
+    private HashSet<Bullet> _activeBullets = new HashSet<Bullet>();
 
     public GameObject GetGameObject => gameObject;
 
     void Update()
     {
-        if (activeBullets.Count < maxBullets &&  Input.GetKeyDown(KeyCode.Space))
+        if (_activeBullets.Count < Parameters.maxAmountBullets &&  Input.GetKeyDown(KeyCode.Space))
         {
-            Shoot();            
+            Shoot(_spawnPoint.position, _spawnPoint.rotation);            
         }
     }
 
     public void BulletDestroid( Bullet bullet)
     {
-        activeBullets.Remove(bullet);
+        _activeBullets.Remove(bullet);
     }
 
-    public void Shoot()
+    public void Shoot(Vector3 spawnPosition, Quaternion rotation)
     {
-        Bullet bullet = Instantiate(bulletPrefab, spawnPoint.position, spawnPoint.rotation);
+        Bullet bullet = Instantiate(_bulletPrefab, spawnPosition, rotation);
 
-        bullet.Owner = this;
+        bullet.SetInitialValues(this, Parameters.bulletSpeed, Parameters.bulletLifeTime);
 
-        activeBullets.Add(bullet);
+        _activeBullets.Add(bullet);
     }
-
 }

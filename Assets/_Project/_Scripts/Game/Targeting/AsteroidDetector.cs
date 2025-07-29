@@ -7,11 +7,11 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
 {
 
     [SerializeField] private SO_AsteroidDetectionParameters soAsteroidDetectionParameters;
-    [SerializeField] private AsteroidDetectionParameters testAsteroidDetectionParameters;
+    [SerializeField, Tooltip("Used when SO is null")] private AsteroidDetectionParameters _debugAsteroidDetectionParameters;
 
-    private AsteroidDetectionParameters GetAsteroidDetectionParameters
+    private AsteroidDetectionParameters Parameters
     {
-        get { return soAsteroidDetectionParameters ? soAsteroidDetectionParameters.asteroidDetectionParameters : testAsteroidDetectionParameters; }
+        get { return soAsteroidDetectionParameters ? soAsteroidDetectionParameters.asteroidDetectionParameters : _debugAsteroidDetectionParameters; }
     }
 
     [Space]
@@ -21,7 +21,7 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
     [SerializeField] private Transform _castPoint;
     [SerializeField] private List<Asteroid> _asteroids;
 
-    public List<Asteroid> listItems => GetAsteroidsSorted();
+    public List<Asteroid> ObjectList => GetAsteroidsSorted();
     public bool ObjectDetected { get; private set; }
 
     void Start()
@@ -39,7 +39,7 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
     {
         bool hit = false;
 
-        for (int i = 0; i < GetAsteroidDetectionParameters.rayAmount; i++)
+        for (int i = 0; i < Parameters.rayAmount; i++)
         {
             RaycastHit2D ray = CastRayIndex(i);
 
@@ -55,7 +55,7 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
         _asteroids.Clear();
 
         // Cast Ray to detect asteroids
-        for (int i = 0; i < GetAsteroidDetectionParameters.rayAmount; i++)
+        for (int i = 0; i < Parameters.rayAmount; i++)
         {
             RaycastHit2D ray = CastRayIndex(i);
             if (ray)
@@ -91,9 +91,9 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
 
     RaycastHit2D CastRayIndex(int index)
     {
-        float dividedAngle = GetAsteroidDetectionParameters.detectionAngle / GetAsteroidDetectionParameters.rayAmount;
-        float angleVariance = dividedAngle * index - GetAsteroidDetectionParameters.detectionAngle / 2;
-        float hitLength = GetAsteroidDetectionParameters.rayLength;
+        float dividedAngle = Parameters.detectionAngle / Parameters.rayAmount;
+        float angleVariance = dividedAngle * index - Parameters.detectionAngle / 2;
+        float hitLength = Parameters.rayLength;
 
         Vector2 direction = Vector2Extensions.RotateVector2(transform.up, angleVariance);
 
@@ -102,8 +102,9 @@ public class AsteroidDetector : MonoBehaviour, ITracker<Asteroid>
         if (ray)
         {
             hitLength = ray.distance;
-            Debug.DrawRay(_castPoint.position, direction * hitLength, Color.blue);
         }
+
+        Debug.DrawRay(_castPoint.position, direction * hitLength, Color.blue);
 
         return ray;
     }
