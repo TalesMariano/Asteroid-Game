@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: Ship Parameters
   m_EditorClassIdentifier: 
   shipParameters:
-    shipSpeed: 5
-    bulletSpeed: 10
-    fireRate: 0.5
-    bigAsteroidPoints: 50
-    smallAsteroidPoints: 100
+    thrustSpeed: 2
+    rotationSpeed: 1.5
+    intangibilityDuration: 2

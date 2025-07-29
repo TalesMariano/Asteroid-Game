@@ -9,13 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dddb283e11f5b1c489f1f964e2ea5629, type: 3}
-  m_Name: Asteroid Parameters
+  m_Script: {fileID: 11500000, guid: 7008c5c5f6b9b494b9e8956536773563, type: 3}
+  m_Name: Shooter Parameters
   m_EditorClassIdentifier: 
-  asteroidParameters:
-    largeScore: 200
-    mediumScore: 100
-    smallScore: 50
-    startForce: 100
-    splitAngle: 30
-    splitAmount: 2
+  shooterParameters:
+    bulletSpeed: 20
+    bulletLifeTime: 1
+    bulletCooldown: 1
+    maxAmountBullets: 3

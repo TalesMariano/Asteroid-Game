@@ -9,13 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dddb283e11f5b1c489f1f964e2ea5629, type: 3}
-  m_Name: Asteroid Parameters
+  m_Script: {fileID: 11500000, guid: 4d02cf8374c30804f92d98b22d20ca9e, type: 3}
+  m_Name: Asteroid Spawner Parameters
   m_EditorClassIdentifier: 
-  asteroidParameters:
-    largeScore: 200
-    mediumScore: 100
-    smallScore: 50
-    startForce: 100
-    splitAngle: 30
-    splitAmount: 2
+  asteroidSpawnerParameters:
+    asteroidPrefab: {fileID: 1816150345252447168, guid: 6f8954bd28ffb4f4bba567b82e70077b, type: 3}
+    spawnDistance: 12
+    amountPerSpawn: 5
