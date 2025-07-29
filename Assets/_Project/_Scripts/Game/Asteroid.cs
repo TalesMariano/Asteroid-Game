@@ -24,10 +24,12 @@ public class Asteroid : MonoBehaviour, IDestructable
         get { return rb.velocity; }
     }
 
-    public Action OnDestroied { get; set ; }
-
+    public Action OnDestroyed { get; set ; }
+    public Action<bool> OnChangeIntangible { get; set; }
 
     public float startForce = 500;
+
+
 
 
     void Awake()
@@ -43,14 +45,9 @@ public class Asteroid : MonoBehaviour, IDestructable
             direction = UnityEngine.Random.insideUnitCircle.normalized;
 
         rb.AddForce(direction * startForce);
-    }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Destroy();
-        }
+
+        GameManager.Instance?.AsteroidCreated(this);
     }
 
 
@@ -82,7 +79,7 @@ public class Asteroid : MonoBehaviour, IDestructable
     {
         Asteroid asteroid = Instantiate(smallerVersionPrefab, transform.position, Quaternion.identity);
 
-        asteroid.direction = RotateVector2(direction, angleVariance);
+        asteroid.direction = Vector2Extensions.RotateVector2(direction, angleVariance);
 
         asteroid.asteroidParameters = asteroidParameters;
     }
@@ -90,20 +87,49 @@ public class Asteroid : MonoBehaviour, IDestructable
     [ContextMenu("Destroy")]
     public void Destroy()
     {
-        OnDestroied?.Invoke();
+        OnDestroyed?.Invoke();
         CreateChild();
+
+        GameManager.Instance?.AsteroidDestroied(this);
+
         Destroy(gameObject);
     }
 
-    public static Vector2 RotateVector2(Vector2 v, float degrees)
+    public int GetScore()
     {
-        float radians = degrees * Mathf.Deg2Rad; // Convert to radians
-        float sin = Mathf.Sin(radians);
-        float cos = Mathf.Cos(radians);
+        int score = 0;
+        if (size == AsteroidSize.Large)
+        {
+            score = asteroidParameters.largeScore;
+        }
+        else if (size == AsteroidSize.Medium)
+        {
+            score = asteroidParameters.mediumScore;
+        }
+        else if (size == AsteroidSize.Small)
+        {
+            score = asteroidParameters.smallScore;
+        }
+        return score;
+    }
 
-        float x = v.x * cos - v.y * sin;
-        float y = v.x * sin + v.y * cos;
+    private void AwardPoints()
+    {
+        GameManager.Instance?.AddScore(GetScore());
+    }
 
-        return new Vector2(x, y);
+
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Destroy();
+        }
+        else if (collision.CompareTag("Bullet"))
+        {
+            AwardPoints();
+            Destroy();
+        }
     }
 }
