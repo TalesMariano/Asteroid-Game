@@ -44,8 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 330248b76c42fa249b84e9aa8c44d8d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _asteroidPrefab: {fileID: 1816150345252447168, guid: 6f8954bd28ffb4f4bba567b82e70077b, type: 3}
   soAsteroidSpawnerParameters: {fileID: 11400000, guid: 79d8bae6b6723244b928d84b6c993604, type: 2}
   _debugAsteroidSpawnerParameters:
-    asteroidPrefab: {fileID: 1816150345252447168, guid: 6f8954bd28ffb4f4bba567b82e70077b, type: 3}
     spawnDistance: 12
     amountPerSpawn: 5

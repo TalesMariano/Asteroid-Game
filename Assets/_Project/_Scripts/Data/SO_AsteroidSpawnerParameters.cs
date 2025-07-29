@@ -9,7 +9,6 @@ public class SO_AsteroidSpawnerParameters : ScriptableObject
 [System.Serializable]
 public class AsteroidSpawnerParameters
 {
-    public Asteroid asteroidPrefab;
     public float spawnDistance = 12f;
     public int amountPerSpawn = 5;
 }
