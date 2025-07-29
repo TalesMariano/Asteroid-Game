@@ -19,7 +19,7 @@ public class TrackingShooter : MonoBehaviour, IShooter
 
     [SerializeField] Transform spawnPoint;
 
-    public GameObject GetGameObject => gameObject ? gameObject : null;
+    public GameObject GetGameObject => this && gameObject ? gameObject : null;
 
 
     private HashSet<Bullet> _activeBullets = new HashSet<Bullet>();
