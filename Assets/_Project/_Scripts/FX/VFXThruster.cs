@@ -10,10 +10,14 @@ public class VFXThruster : MonoBehaviour
     private ParticleSystem.EmissionModule emissionModule;
     [SerializeField] private float rateOverTime = 15;
 
+
+    private AudioSource audioSource;
     void Awake()
     {
         thruster = GetComponentInParent<IThruster>();
         ps = GetComponent<ParticleSystem>();
+
+        audioSource = GetComponent<AudioSource>();
         emissionModule = ps.emission;
     }
 
@@ -22,5 +26,7 @@ public class VFXThruster : MonoBehaviour
         if (thruster == null) return;
 
         emissionModule.rateOverTime = thruster.IsThrusting? rateOverTime: 0;
+
+        if(audioSource) audioSource.volume = thruster.IsThrusting ? 1 : 0;
     }
 }
