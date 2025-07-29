@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour, IDestructable
 {
     private float _speed = 500f;
     private float _maxLifetime = 10f;
 
-    public IShooter Owner { get; set; } 
-
-    public Action OnDestroy;
+    public IShooter Owner { get; set; }
+    public Action OnDestroyed { get ; set ; }
 
     public void SetInitialValues(IShooter owner, float speed, float maxLifetime)
     {
@@ -23,7 +22,7 @@ public class Bullet : MonoBehaviour
     IEnumerator Start()
     {
         yield return new WaitForSeconds(_maxLifetime);
-        DestroyBullet();
+        Destroy();
     }
 
     void Update()
@@ -36,13 +35,13 @@ public class Bullet : MonoBehaviour
         if (collision.gameObject == Owner.GetGameObject) return;
             
             
-        DestroyBullet();
+        Destroy();
     }
 
-    private void DestroyBullet()
+    public void Destroy()
     {
         Owner?.BulletDestroid(this);
-        OnDestroy?.Invoke();
+        OnDestroyed?.Invoke();
         Destroy(gameObject);
     }
 }
