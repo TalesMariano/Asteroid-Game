@@ -24,10 +24,12 @@ public class Asteroid : MonoBehaviour, IDestructable
         get { return rb.velocity; }
     }
 
-    public Action OnDestroied { get; set ; }
-
+    public Action OnDestroyed { get; set ; }
+    public Action<bool> OnChangeIntangible { get; set; }
 
     public float startForce = 500;
+
+
 
 
     void Awake()
@@ -43,14 +45,9 @@ public class Asteroid : MonoBehaviour, IDestructable
             direction = UnityEngine.Random.insideUnitCircle.normalized;
 
         rb.AddForce(direction * startForce);
-    }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Destroy();
-        }
+
+        GameManager.Instance?.AsteroidCreated(this);
     }
 
 
@@ -90,13 +87,49 @@ public class Asteroid : MonoBehaviour, IDestructable
     [ContextMenu("Destroy")]
     public void Destroy()
     {
-        OnDestroied?.Invoke();
+        OnDestroyed?.Invoke();
         CreateChild();
+
+        GameManager.Instance?.AsteroidDestroied(this);
+
         Destroy(gameObject);
     }
 
+    public int GetScore()
     {
+        int score = 0;
+        if (size == AsteroidSize.Large)
+        {
+            score = asteroidParameters.largeScore;
+        }
+        else if (size == AsteroidSize.Medium)
+        {
+            score = asteroidParameters.mediumScore;
+        }
+        else if (size == AsteroidSize.Small)
+        {
+            score = asteroidParameters.smallScore;
+        }
+        return score;
+    }
+
+    private void AwardPoints()
+    {
+        GameManager.Instance?.AddScore(GetScore());
+    }
 
 
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Destroy();
+        }
+        else if (collision.CompareTag("Bullet"))
+        {
+            AwardPoints();
+            Destroy();
+        }
     }
 }
