@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Ship Parameters
   m_EditorClassIdentifier: 
   shipParameters:
-    thrustSpeed: 2
-    rotationSpeed: 1.5
+    thrustSpeed: 1.5
+    rotationSpeed: 2
     intangibilityDuration: 2
