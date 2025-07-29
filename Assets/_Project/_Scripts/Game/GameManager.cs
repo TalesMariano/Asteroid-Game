@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     // Singleton Pattern
     public static GameManager Instance { get; private set; }
 
+
     [SerializeField] 
     private SO_GameParameters soGameParameters;
     [SerializeField, Tooltip("Used when SO is null")] 
@@ -24,22 +25,36 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AsteroidSpawner _asteroidSpawner;
     [SerializeField] private ShipController _shipPrefab;
 
+
     [SerializeField] private int _playerLives;
     public int PlayerLives
     {
         get { return _playerLives; }
-        set {
+        set
+        {
             _playerLives = value;
             OnPlayerLivesChange?.Invoke(_playerLives);
         }
     }
 
 
+    [SerializeField] private GameState _gameState;
+    public GameState GameState
+    {
+        get { return _gameState; }
+        set {
+            _gameState = value;
+            OnGameStateChange?.Invoke(_gameState);
+        }
+    }
+
 
     public int Score { get; private set; }
 
     public Action<int> OnScore;
     public Action<int> OnPlayerLivesChange;
+
+    public Action<GameState> OnGameStateChange;
 
     public Action OnGameStart;
     public Action OnGameOver;
@@ -51,6 +66,11 @@ public class GameManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        GameState = GameState.Intro;
     }
 
 
@@ -124,6 +144,7 @@ public class GameManager : MonoBehaviour
 
 public enum GameState
 {
+    None,
     Intro,
     Gameplay,
     GameOver,
