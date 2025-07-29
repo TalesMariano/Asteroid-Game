@@ -6,7 +6,17 @@ using System;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Asteroid : MonoBehaviour, IDestructable
 {
-    public AsteroidParameters asteroidParameters;
+    [SerializeField] 
+    private SO_AsteroidParameters soAsteroidParameters;
+    [SerializeField, Tooltip("Used when SO is null")] 
+    private AsteroidParameters _debugAsteroidParameters;
+
+    private AsteroidParameters Parameters
+    {
+        get { return soAsteroidParameters ? soAsteroidParameters.asteroidParameters : _debugAsteroidParameters; }
+    }
+
+
     [SerializeField] private AsteroidSize size = AsteroidSize.Large;
     [SerializeField] private Asteroid smallerVersionPrefab;
 
@@ -27,14 +37,19 @@ public class Asteroid : MonoBehaviour, IDestructable
     public Action OnDestroyed { get; set ; }
     public Action<bool> OnChangeIntangible { get; set; }
 
-    public float startForce = 500;
-
-
-
-
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    private void OnEnable()
+    {
+        GameManager.Instance.OnGameReset += ImediateDestroy;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.Instance.OnGameReset -= ImediateDestroy;
     }
 
     void Start()
@@ -44,7 +59,7 @@ public class Asteroid : MonoBehaviour, IDestructable
         if (direction == null || direction == Vector2.zero)
             direction = UnityEngine.Random.insideUnitCircle.normalized;
 
-        rb.AddForce(direction * startForce);
+        rb.AddForce(direction * Parameters.startForce);
 
 
         GameManager.Instance?.AsteroidCreated(this);
@@ -55,20 +70,20 @@ public class Asteroid : MonoBehaviour, IDestructable
     {
         if (!smallerVersionPrefab) return;
 
-        if(asteroidParameters.splitAmount <= 0)
+        if(Parameters.splitAmount <= 0)
         {
             return;
-        }else if(asteroidParameters.splitAmount == 1)
+        }else if(Parameters.splitAmount == 1)
         {
             InstantiateChild(0);
         }
         else
         {
-            float dividedAngle = asteroidParameters.SplitAngle / asteroidParameters.splitAmount;
+            float dividedAngle = Parameters.splitAngle / Parameters.splitAmount;
 
-            for (int i = 0; i < asteroidParameters.splitAmount; i++)
+            for (int i = 0; i < Parameters.splitAmount; i++)
             {
-                float angleVariance = dividedAngle*i - asteroidParameters.SplitAngle/2;
+                float angleVariance = dividedAngle*i - Parameters.splitAngle/2;
 
                 InstantiateChild(angleVariance);
             }
@@ -80,8 +95,6 @@ public class Asteroid : MonoBehaviour, IDestructable
         Asteroid asteroid = Instantiate(smallerVersionPrefab, transform.position, Quaternion.identity);
 
         asteroid.direction = Vector2Extensions.RotateVector2(direction, angleVariance);
-
-        asteroid.asteroidParameters = asteroidParameters;
     }
 
     [ContextMenu("Destroy")]
@@ -95,20 +108,25 @@ public class Asteroid : MonoBehaviour, IDestructable
         Destroy(gameObject);
     }
 
+    void ImediateDestroy()
+    {
+        Destroy(gameObject);
+    }
+
     public int GetScore()
     {
         int score = 0;
         if (size == AsteroidSize.Large)
         {
-            score = asteroidParameters.largeScore;
+            score = Parameters.largeScore;
         }
         else if (size == AsteroidSize.Medium)
         {
-            score = asteroidParameters.mediumScore;
+            score = Parameters.mediumScore;
         }
         else if (size == AsteroidSize.Small)
         {
-            score = asteroidParameters.smallScore;
+            score = Parameters.smallScore;
         }
         return score;
     }

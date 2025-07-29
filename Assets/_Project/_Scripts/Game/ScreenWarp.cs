@@ -1,52 +1,42 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class ScreenWarp : MonoBehaviour
 {
-    private Rigidbody2D rb;
+    private Bounds _screenBounds;
 
-    public bool screenWrapping = true;
-    private Bounds screenBounds;
-
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
+    [SerializeField] private float _boundPlus = 0.5f;
 
     private void Start()
     {
         // Convert screen space bounds to world space bounds
-        screenBounds = new Bounds();
-        screenBounds.Encapsulate(Camera.main.ScreenToWorldPoint(Vector3.zero));
-        screenBounds.Encapsulate(Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f)));
+        _screenBounds = new Bounds();
+        _screenBounds.Encapsulate(Camera.main.ScreenToWorldPoint(Vector3.zero));
+        _screenBounds.Encapsulate(Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f)));
     }
 
     void FixedUpdate()
     {
-        if (screenWrapping)
-        {
-            Wrap();
-        }
+        Wrap();
     }
 
     private void Wrap()
     {
         // Move to the opposite side of the screen if the player exceeds the bounds
-        if (rb.position.x > screenBounds.max.x + 0.5f)
+        if (transform.position.x > _screenBounds.max.x + _boundPlus)
         {
-            rb.position = new Vector2(screenBounds.min.x - 0.5f, rb.position.y);
+            transform.position = new Vector2(_screenBounds.min.x - _boundPlus, transform.position.y);
         }
-        else if (rb.position.x < screenBounds.min.x - 0.5f)
+        else if (transform.position.x < _screenBounds.min.x - _boundPlus)
         {
-            rb.position = new Vector2(screenBounds.max.x + 0.5f, rb.position.y);
+            transform.position = new Vector2(_screenBounds.max.x + _boundPlus, transform.position.y);
         }
-        else if (rb.position.y > screenBounds.max.y + 0.5f)
+        else if (transform.position.y > _screenBounds.max.y + _boundPlus)
         {
-            rb.position = new Vector2(rb.position.x, screenBounds.min.y - 0.5f);
+            transform.position = new Vector2(transform.position.x, _screenBounds.min.y - _boundPlus);
         }
-        else if (rb.position.y < screenBounds.min.y - 0.5f)
+        else if (transform.position.y < _screenBounds.min.y - _boundPlus)
         {
-            rb.position = new Vector2(rb.position.x, screenBounds.max.y + 0.5f);
+            transform.position = new Vector2(transform.position.x, _screenBounds.max.y + _boundPlus);
         }
     }
 }

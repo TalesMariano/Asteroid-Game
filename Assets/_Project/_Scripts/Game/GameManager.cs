@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private AsteroidSpawner _asteroidSpawner;
     [SerializeField] private ShipController _shipPrefab;
+    private ShipController _currentShip;
 
 
     [SerializeField] private int _playerLives;
@@ -58,6 +59,7 @@ public class GameManager : MonoBehaviour
 
     public Action OnGameStart;
     public Action OnGameOver;
+    public Action OnGameReset;
 
 
     private HashSet<Asteroid> _activeAsteroids = new HashSet<Asteroid>();
@@ -73,6 +75,18 @@ public class GameManager : MonoBehaviour
         GameState = GameState.Intro;
     }
 
+    private void Update()
+    {
+        if(GameState == GameState.Intro && Input.anyKeyDown)
+        {
+            StartGame();
+        }
+
+        // Quit Game
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+    }
+
 
     public void AddScore(int points)
     {
@@ -83,6 +97,10 @@ public class GameManager : MonoBehaviour
     [ContextMenu("StartGame")]
     public void StartGame()
     {
+        ResetScene();
+
+        GameState = GameState.Gameplay;
+
         PlayerLives = Parameters.playerLives;
 
         _asteroidSpawner.Spawn();
@@ -94,9 +112,9 @@ public class GameManager : MonoBehaviour
     void SpawnPlayerShip()
     {
         Vector3 spanwLocation = Vector3.zero;
-        ShipController ship =  Instantiate(_shipPrefab, spanwLocation, Quaternion.identity);
+        _currentShip =  Instantiate(_shipPrefab, spanwLocation, Quaternion.identity);
 
-        ship.OnDestroyed += PlayerHit;
+        _currentShip.OnDestroyed += PlayerHit;
     }
 
 
@@ -111,8 +129,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("GameOver");
-            OnGameOver?.Invoke();
+            GameOver();
         }
     }
 
@@ -131,14 +148,56 @@ public class GameManager : MonoBehaviour
     {
         if(_activeAsteroids.Count == 0)
         {
-            Debug.Log("Game Won");
+            //GameWon();
+            PlayerLives++;
+            _asteroidSpawner.Spawn();
         }
+    }
+
+    void GameWon()
+    {
+        Debug.Log("Game Won");
+        GameState = GameState.GameWon;
+
+        StartCoroutine(WaitGameOver(3));
+    }
+
+    void GameOver()
+    {
+        Debug.Log("GameOver");
+        GameState = GameState.GameOver;
+        OnGameOver?.Invoke();
+
+        StartCoroutine(WaitGameOver(3));
+    }
+
+    void GoToIntro()
+    {
+        GameState = GameState.Intro;
+    }
+
+    [ContextMenu("ResetScene")]
+    void ResetScene()
+    {
+        OnGameReset?.Invoke();
+
+        _activeAsteroids.Clear();
+
+        if(_currentShip) Destroy(_currentShip.gameObject);
+
+        Score = 0;
     }
 
     IEnumerator WaitRespawn(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
         SpawnPlayerShip();
+    }
+
+    IEnumerator WaitGameOver(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        GoToIntro();
     }
 }
 
