@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: boundPlus
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 729063610046461974, guid: b3e5bd44db326624d801775582f49ce2, type: 3}
+      propertyPath: _boundPlus
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2288248138432309735, guid: b3e5bd44db326624d801775582f49ce2, type: 3}
       propertyPath: smallerVersion
       value: 

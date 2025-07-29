@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: Asteroid Spawner Parameters
   m_EditorClassIdentifier: 
   asteroidSpawnerParameters:
-    asteroidPrefab: {fileID: 1816150345252447168, guid: 6f8954bd28ffb4f4bba567b82e70077b, type: 3}
     spawnDistance: 12
-    amountPerSpawn: 5
+    amountPerSpawn: 4

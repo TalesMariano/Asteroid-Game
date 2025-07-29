@@ -17,5 +17,5 @@ MonoBehaviour:
     mediumScore: 100
     smallScore: 50
     startForce: 80
-    splitAngle: 45
+    splitAngle: 60
     splitAmount: 2

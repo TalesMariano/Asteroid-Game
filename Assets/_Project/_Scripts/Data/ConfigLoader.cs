@@ -5,12 +5,18 @@ using UnityEngine.Networking;
 
 public class ConfigLoader : MonoBehaviour
 {
-    public ScriptableObject[] scriptableObjects;
+    [SerializeField] private bool loadOnEditor = false;
 
+    public ScriptableObject[] scriptableObjects;
 
     private void Awake()
     {
+#if UNITY_EDITOR
+        if(loadOnEditor) StartCoroutine(CoroutineLoadAllJsons());
+#else
         StartCoroutine(CoroutineLoadAllJsons());
+
+#endif
     }
 
     IEnumerator CoroutineLoadAllJsons()
@@ -63,6 +69,7 @@ public class ConfigLoader : MonoBehaviour
         {
             SaveScriptableObjectAsJson(scriptableObject);
         }
+        Debug.Log(" Streaming Assets Json Files Created");
     }
 
     private void SaveScriptableObjectAsJson(ScriptableObject so)
