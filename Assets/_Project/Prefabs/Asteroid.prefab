@@ -217,15 +217,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba815739a9abffd4aa781356f539bb57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  asteroidParameters:
+  soAsteroidParameters: {fileID: 11400000, guid: 1dcaf6f4a595c7841b8ab1aee401b526, type: 2}
+  _debugAsteroidParameters:
     largeScore: 200
     mediumScore: 100
     smallScore: 50
-    SplitAngle: 30
+    startForce: 100
+    splitAngle: 30
     splitAmount: 2
   size: 0
   smallerVersionPrefab: {fileID: 0}
-  startForce: 100
 --- !u!114 &729063610046461974
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -23,7 +23,7 @@ public class UIPlayerLives : MonoBehaviour
 
     private void OnDisable()
     {
-        GameManager.Instance.OnPlayerLivesChange += UpdateLifeAmount;
+        GameManager.Instance.OnPlayerLivesChange -= UpdateLifeAmount;
     }
 
     private void Start()

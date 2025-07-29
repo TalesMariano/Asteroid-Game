@@ -278,6 +278,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6111304240465167002}
   - component: {fileID: 1121349902006282762}
+  - component: {fileID: 7419588164992206102}
   m_Layer: 5
   m_Name: Game Title
   m_TagString: Untagged
@@ -318,3 +319,16 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &7419588164992206102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6465706427323366232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637448aabac7e7f46b9ceda9fd47d370, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  screenGameState: 1

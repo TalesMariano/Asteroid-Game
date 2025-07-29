@@ -275,15 +275,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b718c92306cb4c74fbd6541e4006417b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpawnPoint: {fileID: 2739246509374887330}
-  bulletPrefab: {fileID: 0}
   shipParametersSO: {fileID: 11400000, guid: ce3fad5a1cdae1249aff878ef341623d, type: 2}
-  shipParameters:
-    thrustSpeed: 10
+  _debugShipParameters:
+    thrustSpeed: 1
     rotationSpeed: 1.5
-    shipMaxSpeed: 5
-    bulletSpeed: 10
-    fireRate: 0.5
     intangibilityDuration: 2
 --- !u!114 &1484644130754862841
 MonoBehaviour:
@@ -297,8 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9996d04c8ca2ef499772c0b931c10b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenWrapping: 1
-  boundPlus: 0.5
+  _boundPlus: 0.5
 --- !u!114 &-3950302961372025904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,7 +332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soAsteroidDetectionParameters: {fileID: 11400000, guid: 705660ef102d63d4e9fe525389b8b882, type: 2}
-  testAsteroidDetectionParameters:
+  _debugAsteroidDetectionParameters:
     rayAmount: 8
     rayLength: 5
     detectionAngle: 45
@@ -356,11 +350,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d0cd2e4d7ae8f846abbe9de2c53f06f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tempShip: {fileID: 0}
-  bulletPrefab: {fileID: 0}
-  bulletPower: 30
-  bulletCooldown: 1
-  startPosition: {fileID: 2739246509374887330}
+  bulletPrefab: {fileID: 8255962422322191121, guid: 29f38cc40505cd748a67e9d675fa0aaf, type: 3}
+  soShooterParameters: {fileID: 11400000, guid: 4144ddc68c54647499fa2fa78be9af42, type: 2}
+  _debugShooterParameters:
+    bulletSpeed: 20
+    bulletLifeTime: 1
+    bulletCooldown: 1
+    maxAmountBullets: 3
+  spawnPoint: {fileID: 2739246509374887330}
 --- !u!1 &5993772401236163447
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,7 +368,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2739246509374887330}
   m_Layer: 0
-  m_Name: BulletSpawnPoint
+  m_Name: Ship Tip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

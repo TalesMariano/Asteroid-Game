@@ -1,64 +1,109 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
+
 [RequireComponent(typeof(Rigidbody2D))]
-public class ShipController : MonoBehaviour
+public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThruster
 {
 
-    [Header("References")]
-    public Transform bulletSpawnPoint;
-    public GameObject bulletPrefab;
+    
+
+    [SerializeField] 
+    private SO_ShipParameters shipParametersSO;
+    [SerializeField, Tooltip("Used when SO is null")] 
+    private ShipParameters _debugShipParameters;
+
+    private ShipParameters Parameters
+    {
+        get { return shipParametersSO ? shipParametersSO.shipParameters : _debugShipParameters; }
+    }
 
     private Rigidbody2D rb;
 
-    public SO_ShipParameters shipParametersSO;
-    public ShipParameters shipParameters;
-    
-    public bool thrusting { get; private set; }
-    private float turnDirection;
 
-    private void Start()
+
+    public bool IsThrusting { get; private set; }
+
+
+    public Action OnDestroyed { get; set;}
+    public Action<bool> OnChangeIntangible { get; set; }
+
+    private float _turnDirection;
+
+
+    private bool isIntangible = false;
+    public bool IsIntangible
+    {
+        get { return isIntangible; }
+        private set
+        {
+            isIntangible = value;
+            OnChangeIntangible?.Invoke(isIntangible);
+        }
+    }
+
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
 
-        if (shipParametersSO) shipParameters = shipParametersSO.shipParameters;
+
+    IEnumerator Start()
+    {
+        IsIntangible = true;
+        yield return new WaitForSeconds(Parameters.intangibilityDuration);
+        IsIntangible = false;
     }
 
 
 
     private void Update()
     {
-        thrusting = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+        IsThrusting = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
-            turnDirection = 1f;
+            _turnDirection = 1f;
         }
         else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         {
-            turnDirection = -1f;
+            _turnDirection = -1f;
         }
         else
         {
-            turnDirection = 0f;
+            _turnDirection = 0f;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-        {
-            //Shoot();
-        }
     }
 
     private void FixedUpdate()
     {
-        if (thrusting)
+        if (IsThrusting)
         {
-            rb.AddForce(transform.up * shipParameters.thrustSpeed);
+            rb.AddForce(transform.up * Parameters.thrustSpeed * Time.deltaTime * 100);
         }
 
-        if (turnDirection != 0f)
+        if (_turnDirection != 0f)
         {
-            transform.Rotate(Vector3.forward * shipParameters.rotationSpeed * turnDirection * Time.deltaTime * 100);
+            transform.Rotate(Vector3.forward * Parameters.rotationSpeed * _turnDirection * Time.deltaTime * 100);
         }
     }
 
+
+    [ContextMenu("Destroy")]
+    public void Destroy()
+    {
+        OnDestroyed?.Invoke();
+        Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!IsIntangible && collision.gameObject.CompareTag("Asteroid"))
+        {
+            Destroy();
+        }
+    }
 }

@@ -33,7 +33,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (Owner != null && Owner.GetGameObject!= null && collision.gameObject == Owner.GetGameObject) return;
+        if (collision.gameObject == Owner.GetGameObject) return;
             
             
         DestroyBullet();

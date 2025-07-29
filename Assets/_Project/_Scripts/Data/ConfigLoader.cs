@@ -52,7 +52,7 @@ public class ConfigLoader : MonoBehaviour
             jsonData = System.IO.File.ReadAllText(filePath);
         }
 
-        JsonUtility.FromJsonOverwrite(System.IO.File.ReadAllText(jsonData), outSO);
+        JsonUtility.FromJsonOverwrite(jsonData, outSO);
         Debug.Log("Json Overwrited: " + jsonName);
     }
 
