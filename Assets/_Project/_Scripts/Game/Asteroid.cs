@@ -40,6 +40,8 @@ public class Asteroid : MonoBehaviour, IDestructable
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        GameManager.Instance?.AsteroidCreated(this);
     }
 
     private void OnEnable()
@@ -62,7 +64,6 @@ public class Asteroid : MonoBehaviour, IDestructable
         rb.AddForce(direction * Parameters.startForce);
 
 
-        GameManager.Instance?.AsteroidCreated(this);
     }
 
 
