@@ -82,7 +82,7 @@ public class Asteroid : MonoBehaviour, IDestructable
     {
         Asteroid asteroid = Instantiate(smallerVersionPrefab, transform.position, Quaternion.identity);
 
-        asteroid.direction = RotateVector2(direction, angleVariance);
+        asteroid.direction = Vector2Extensions.RotateVector2(direction, angleVariance);
 
         asteroid.asteroidParameters = asteroidParameters;
     }
@@ -95,15 +95,8 @@ public class Asteroid : MonoBehaviour, IDestructable
         Destroy(gameObject);
     }
 
-    public static Vector2 RotateVector2(Vector2 v, float degrees)
     {
-        float radians = degrees * Mathf.Deg2Rad; // Convert to radians
-        float sin = Mathf.Sin(radians);
-        float cos = Mathf.Cos(radians);
 
-        float x = v.x * cos - v.y * sin;
-        float y = v.x * sin + v.y * cos;
 
-        return new Vector2(x, y);
     }
 }
