@@ -24,7 +24,6 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
     public Action<bool> OnChangeIntangible { get; set; }
 
 
-
     private bool isIntangible = false;
     public bool IsIntangible
     {
@@ -65,7 +64,6 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
         {
             _turnDirection = 0f;
         }
-
     }
 
     private void FixedUpdate()
@@ -80,7 +78,6 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
             transform.Rotate(Vector3.forward * Parameters.rotationSpeed * _turnDirection * Time.deltaTime * 100);
         }
     }
-
 
     [ContextMenu("Destroy")]
     public void Destroy()
