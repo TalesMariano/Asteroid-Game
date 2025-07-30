@@ -5,28 +5,28 @@ using UnityEngine;
 [RequireComponent(typeof(ParticleSystem ))]
 public class VFXThruster : MonoBehaviour
 {
-    private IThruster thruster;
-    private ParticleSystem ps;
-    private ParticleSystem.EmissionModule emissionModule;
-    [SerializeField] private float rateOverTime = 15;
+    private IThruster _thruster;
+    private ParticleSystem _ps;
+    private ParticleSystem.EmissionModule _emissionModule;
+    private AudioSource _audioSource;
+    [SerializeField] private float _rateOverTime = 15;
 
 
-    private AudioSource audioSource;
     void Awake()
     {
-        thruster = GetComponentInParent<IThruster>();
-        ps = GetComponent<ParticleSystem>();
+        _thruster = GetComponentInParent<IThruster>();
+        _ps = GetComponent<ParticleSystem>();
 
-        audioSource = GetComponent<AudioSource>();
-        emissionModule = ps.emission;
+        _audioSource = GetComponent<AudioSource>();
+        _emissionModule = _ps.emission;
     }
 
     void Update()
     {
-        if (thruster == null) return;
+        if (_thruster == null) return;
 
-        emissionModule.rateOverTime = thruster.IsThrusting? rateOverTime: 0;
+        _emissionModule.rateOverTime = _thruster.IsThrusting? _rateOverTime: 0;
 
-        if(audioSource) audioSource.volume = thruster.IsThrusting ? 1 : 0;
+        if(_audioSource) _audioSource.volume = _thruster.IsThrusting ? 1 : 0;
     }
 }

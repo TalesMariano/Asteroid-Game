@@ -7,6 +7,7 @@ public class TrackingShooter : MonoBehaviour, IShooter
     private ITracker<Asteroid> _asteroidTracker;
 
     [SerializeField] private Bullet bulletPrefab;
+    [SerializeField] Transform spawnPoint;
 
     [SerializeField] private SO_ShooterParameters soShooterParameters;
     [SerializeField, Tooltip("Used when SO is null")] private ShooterParameters _debugShooterParameters;
@@ -17,7 +18,6 @@ public class TrackingShooter : MonoBehaviour, IShooter
 
     private float _currentCooldown;
 
-    [SerializeField] Transform spawnPoint;
 
     public GameObject GetGameObject => this && gameObject ? gameObject : null;
 

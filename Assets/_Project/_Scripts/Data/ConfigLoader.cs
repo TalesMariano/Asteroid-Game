@@ -5,14 +5,14 @@ using UnityEngine.Networking;
 
 public class ConfigLoader : MonoBehaviour
 {
-    [SerializeField] private bool loadOnEditor = false;
+    [SerializeField] private bool _loadOnEditor = false;
 
     public ScriptableObject[] scriptableObjects;
 
     private void Awake()
     {
 #if UNITY_EDITOR
-        if(loadOnEditor) StartCoroutine(CoroutineLoadAllJsons());
+        if(_loadOnEditor) StartCoroutine(CoroutineLoadAllJsons());
 #else
         StartCoroutine(CoroutineLoadAllJsons());
 

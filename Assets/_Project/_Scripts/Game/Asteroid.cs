@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Asteroid : MonoBehaviour, IDestructable
+public class Asteroid : MonoBehaviour, IDestructable, IScorable
 {
     [SerializeField] 
     private SO_AsteroidParameters soAsteroidParameters;
@@ -132,22 +132,16 @@ public class Asteroid : MonoBehaviour, IDestructable
         return score;
     }
 
-    private void AwardPoints()
+    public void ScorePoints()
     {
         GameManager.Instance?.AddScore(GetScore());
     }
-
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            Destroy();
-        }
-        else if (collision.CompareTag("Bullet"))
-        {
-            AwardPoints();
             Destroy();
         }
     }

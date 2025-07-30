@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour, IDestructable
 {
     private float _speed = 500f;
     private float _maxLifetime = 10f;
+    private bool _hasCollided = false;
 
     public IShooter Owner { get; set; }
     public Action OnDestroyed { get ; set ; }
@@ -32,9 +33,16 @@ public class Bullet : MonoBehaviour, IDestructable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject == Owner.GetGameObject) return;
-            
-            
+        if (_hasCollided || collision.gameObject == Owner.GetGameObject) return;
+
+        if (collision.CompareTag("Asteroid"))
+        {
+            collision.GetComponentInParent<IScorable>().ScorePoints();
+            collision.GetComponentInParent<IDestructable>().Destroy();
+        }
+
+        _hasCollided = true;
+
         Destroy();
     }
 

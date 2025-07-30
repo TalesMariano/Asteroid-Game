@@ -6,9 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThruster
 {
-
-    
-
     [SerializeField] 
     private SO_ShipParameters shipParametersSO;
     [SerializeField, Tooltip("Used when SO is null")] 
@@ -19,17 +16,13 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
         get { return shipParametersSO ? shipParametersSO.shipParameters : _debugShipParameters; }
     }
 
-    private Rigidbody2D rb;
-
-
+    private Rigidbody2D _rb;
+    private float _turnDirection;
 
     public bool IsThrusting { get; private set; }
-
-
     public Action OnDestroyed { get; set;}
     public Action<bool> OnChangeIntangible { get; set; }
 
-    private float _turnDirection;
 
 
     private bool isIntangible = false;
@@ -46,9 +39,8 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
     }
-
 
     IEnumerator Start()
     {
@@ -56,8 +48,6 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
         yield return new WaitForSeconds(Parameters.intangibilityDuration);
         IsIntangible = false;
     }
-
-
 
     private void Update()
     {
@@ -82,7 +72,7 @@ public class ShipController : MonoBehaviour, IDestructable, IIntangible, IThrust
     {
         if (IsThrusting)
         {
-            rb.AddForce(transform.up * Parameters.thrustSpeed * Time.deltaTime * 100);
+            _rb.AddForce(transform.up * Parameters.thrustSpeed * Time.deltaTime * 100);
         }
 
         if (_turnDirection != 0f)
